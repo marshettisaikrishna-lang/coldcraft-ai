@@ -3,364 +3,647 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ColdCraft AI — Cold Email Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<title>ColdCraft AI — AI Cold Email Generator That Gets Replies</title>
+<link rel="icon" href="/logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0a0a0f;--surface:#111118;--surface2:#18181f;
-    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-    --accent:#6ee7b7;--accent2:#34d399;
-    --accent-glow:rgba(110,231,183,0.15);--accent-glow2:rgba(110,231,183,0.06);
-    --text:#f0f0f4;--text2:#9090a0;--text3:#5a5a70;
-    --red:#f87171;--gold:#fbbf24;
-    --radius:14px;--radius-sm:8px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(110,231,183,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(110,231,183,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-  body::after{content:'';position:fixed;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(110,231,183,0.08) 0%,transparent 70%);pointer-events:none;z-index:0;}
-  .wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px;}
-  nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0;border-bottom:1px solid var(--border);}
-  .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px;}
-  .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);}
-  .nav-right{display:flex;align-items:center;gap:10px;}
-  .nav-badge{background:var(--accent-glow2);border:1px solid rgba(110,231,183,0.2);color:var(--accent);font-size:12px;font-weight:500;padding:4px 12px;border-radius:100px;}
-  .plan-badge{font-size:12px;font-weight:600;padding:4px 12px;border-radius:100px;border:1px solid;}
-  .plan-free{color:var(--gold);border-color:rgba(251,191,36,0.3);background:rgba(251,191,36,0.07);}
-  .plan-pro{color:var(--accent);border-color:rgba(110,231,183,0.3);background:var(--accent-glow2);}
-  .hero{text-align:center;padding:60px 0 36px;}
-  .hero-tag{display:inline-flex;align-items:center;gap:6px;background:var(--accent-glow2);border:1px solid rgba(110,231,183,0.2);color:var(--accent);font-size:13px;padding:6px 14px;border-radius:100px;margin-bottom:22px;animation:fadeUp 0.6s ease both;}
-  .hero-tag span{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s ease infinite;}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-  h1{font-family:'Syne',sans-serif;font-size:clamp(32px,5.5vw,60px);font-weight:800;line-height:1.05;letter-spacing:-1px;animation:fadeUp 0.6s 0.1s ease both;}
-  h1 em{font-style:normal;color:var(--accent);}
-  .hero-sub{color:var(--text2);font-size:17px;line-height:1.6;max-width:500px;margin:16px auto 0;animation:fadeUp 0.6s 0.2s ease both;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  .stats{display:flex;justify-content:center;gap:40px;padding:16px 0 32px;flex-wrap:wrap;animation:fadeUp 0.6s 0.3s ease both;}
-  .stat{text-align:center;}
-  .stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--accent);}
-  .stat-label{font-size:12px;color:var(--text3);margin-top:2px;}
-  .app-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;box-shadow:0 0 80px rgba(110,231,183,0.05);animation:fadeUp 0.6s 0.35s ease both;}
-  .card-header{display:flex;border-bottom:1px solid var(--border);}
-  .tab{padding:16px 22px;font-size:14px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;}
-  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
-  .tab:hover:not(.active){color:var(--text2);}
-  .card-body{padding:32px;}
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  .form-full{grid-column:1/-1;}
-  .field{display:flex;flex-direction:column;gap:8px;}
-  label{font-size:13px;font-weight:500;color:var(--text2);}
-  label .req{color:var(--accent);font-size:10px;margin-left:4px;}
-  input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:12px 14px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;width:100%;}
-  input:focus,select:focus,textarea:focus{border-color:rgba(110,231,183,0.4);box-shadow:0 0 0 3px rgba(110,231,183,0.08);}
-  select{cursor:pointer;}
-  select option{background:var(--surface2);}
-  textarea{resize:vertical;min-height:88px;line-height:1.5;}
-  .tone-grid{display:flex;gap:8px;flex-wrap:wrap;}
-  .tone-btn{padding:7px 14px;border-radius:100px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.18s;user-select:none;}
-  .tone-btn:hover{border-color:var(--border2);color:var(--text);}
-  .tone-btn.active{background:var(--accent-glow);border-color:rgba(110,231,183,0.4);color:var(--accent);}
-  .btn-generate{width:100%;padding:16px;background:var(--accent);color:#0a0a0f;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;border:none;border-radius:var(--radius);cursor:pointer;margin-top:8px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden;}
-  .btn-generate:hover:not(:disabled){background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(110,231,183,0.25);}
-  .btn-generate:disabled{opacity:.5;cursor:not-allowed;}
-  .btn-generate::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transform:translateX(-100%);transition:transform 0.4s;}
-  .btn-generate:not(:disabled):hover::after{transform:translateX(100%);}
-  .btn-sm{padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.18s;}
-  .btn-sm:hover{border-color:var(--border2);color:var(--text);}
-  .btn-sm.copied{border-color:rgba(110,231,183,0.4);color:var(--accent);}
-  .output-section{margin-top:28px;}
-  .output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .output-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
-  .output-actions{display:flex;gap:8px;}
-  .output-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;min-height:160px;font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap;}
-  .output-placeholder{color:var(--text3);display:flex;align-items:center;justify-content:center;min-height:160px;flex-direction:column;gap:12px;text-align:center;}
-  .loading-dots{display:flex;gap:6px;align-items:center;}
-  .loading-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.3;animation:dot 1.2s ease infinite;}
-  .loading-dots span:nth-child(2){animation-delay:.2s}.loading-dots span:nth-child(3){animation-delay:.4s}
-  @keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.3}40%{transform:scale(1.2);opacity:1}}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-  .cursor{display:inline-block;width:2px;height:14px;background:var(--accent);margin-left:2px;vertical-align:middle;animation:blink 0.8s ease infinite;}
-  .score-bar{margin-top:14px;display:flex;align-items:center;gap:12px;}
-  .score-label{font-size:12px;color:var(--text3);white-space:nowrap;}
-  .score-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
-  .score-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width 1s ease 0.3s;}
-  .score-num{font-size:12px;font-weight:600;color:var(--accent);min-width:32px;text-align:right;}
-  .word-count{font-size:11px;color:var(--text3);margin-top:8px;text-align:right;}
-  .error-msg{background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);color:var(--red);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;margin-top:8px;display:none;}
-  .error-msg.show{display:block;}
-  .trial-banner{border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;background:linear-gradient(135deg,rgba(251,191,36,0.08),rgba(251,191,36,0.04));border:1px solid rgba(251,191,36,0.2);}
-  .trial-text{font-size:13px;color:var(--gold);}
-  .trial-count{font-size:20px;font-weight:700;font-family:'Syne',sans-serif;color:var(--gold);white-space:nowrap;}
-  .paywall-overlay{position:fixed;inset:0;z-index:100;background:rgba(10,10,15,0.93);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(6px);}
-  .paywall-card{background:var(--surface);border:1px solid var(--border2);border-radius:24px;padding:44px 40px;max-width:460px;width:100%;text-align:center;box-shadow:0 0 80px rgba(110,231,183,0.1);animation:fadeUp 0.4s ease both;}
-  .paywall-icon{font-size:40px;margin-bottom:16px;}
-  .paywall-card h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:10px;}
-  .paywall-card p{color:var(--text2);font-size:15px;line-height:1.6;margin-bottom:24px;}
-  .price-tag{display:inline-flex;align-items:baseline;gap:4px;font-family:'Syne',sans-serif;margin-bottom:24px;}
-  .price-currency{font-size:20px;font-weight:700;color:var(--accent);align-self:flex-start;margin-top:6px;}
-  .price-amount{font-size:52px;font-weight:800;color:var(--accent);line-height:1;}
-  .price-period{font-size:14px;color:var(--text2);}
-  .price-features{text-align:left;margin-bottom:24px;display:flex;flex-direction:column;gap:10px;}
-  .price-feature{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);}
-  .price-feature::before{content:'✓';color:var(--accent);font-weight:700;font-size:14px;flex-shrink:0;}
-  .btn-pay{width:100%;padding:16px;background:var(--accent);color:#0a0a0f;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;border:none;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;margin-bottom:12px;}
-  .btn-pay:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 8px 30px rgba(110,231,183,0.25);}
-  .paywall-note{font-size:12px;color:var(--text3);}
-  .paywall-note a{color:var(--text2);text-decoration:none;}
-  .stripe-badge{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;font-size:12px;color:var(--text3);}
-  .history-list{display:flex;flex-direction:column;gap:12px;}
-  .history-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;cursor:pointer;transition:all 0.2s;}
-  .history-item:hover{border-color:var(--border2);}
-  .history-meta{display:flex;justify-content:space-between;margin-bottom:6px;}
-  .history-niche{font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;}
-  .history-time{font-size:11px;color:var(--text3);}
-  .history-preview{font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .empty-history{text-align:center;padding:48px 0;color:var(--text3);font-size:14px;}
-  .tips-list{display:flex;flex-direction:column;gap:14px;}
-  .tip-item{display:flex;gap:16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
-  .tip-num{width:28px;height:28px;border-radius:50%;background:var(--accent-glow);border:1px solid rgba(110,231,183,0.3);color:var(--accent);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .tip-text h4{font-size:14px;font-weight:600;margin-bottom:4px;}
-  .tip-text p{font-size:13px;color:var(--text2);line-height:1.5;}
-  footer{text-align:center;padding:36px 0;color:var(--text3);font-size:13px;border-top:1px solid var(--border);margin-top:60px;}
-  footer a{color:var(--text2);text-decoration:none;}
-  footer a:hover{color:var(--accent);}
-  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid rgba(110,231,183,0.3);color:var(--accent);padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s ease;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,0.4);}
-  .toast.show{transform:translateY(0);opacity:1;}
-  @media(max-width:640px){.form-grid{grid-template-columns:1fr;}.stats{gap:20px;}.card-body{padding:18px;}h1{font-size:30px;}.paywall-card{padding:32px 22px;}.price-amount{font-size:40px;}}
+:root{
+  --bg:#0a0014;
+  --bg2:#0d0018;
+  --surface:#130020;
+  --surface2:#1a0028;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --accent:#d946ef;
+  --accent2:#c026d3;
+  --accent3:#e879f9;
+  --blue:#38bdf8;
+  --blue2:#7dd3fc;
+  --text:#f8fafc;
+  --text2:#94a3b8;
+  --text3:#475569;
+  --green:#10b981;
+  --red:#ef4444;
+  --gold:#f59e0b;
+  --radius:12px;
+  --radius-lg:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;}
+
+/* Gradient background */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 70% 50% at 20% 20%,rgba(56,189,248,0.08),transparent),
+  radial-gradient(ellipse 60% 50% at 80% 80%,rgba(217,70,239,0.1),transparent),
+  radial-gradient(ellipse 50% 40% at 50% 50%,rgba(168,85,247,0.05),transparent);
+pointer-events:none;z-index:0;}
+
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,0,20,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 0;}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Inter',sans-serif;font-weight:700;font-size:17px;text-decoration:none;color:var(--text);}
+.logo img{width:32px;height:32px;border-radius:7px;}
+.nav-links{display:flex;align-items:center;gap:28px;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;}
+.nav-links a:hover{color:var(--text);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.plan-pill{background:rgba(217,70,239,0.1);border:1px solid rgba(217,70,239,0.25);color:var(--accent3);font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;}
+.nav-cta{background:var(--accent);color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:all 0.2s;}
+.nav-cta:hover{background:var(--accent2);transform:translateY(-1px);}
+
+/* HERO */
+.hero{padding:88px 0 60px;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.2);color:var(--blue2);font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px;margin-bottom:24px;animation:fadeUp 0.5s ease both;}
+.hero-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--blue2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero h1{font-size:clamp(36px,5.5vw,62px);font-weight:800;line-height:1.08;letter-spacing:-1.5px;margin-bottom:20px;animation:fadeUp 0.5s 0.08s ease both;}
+.hero h1 .hl{background:linear-gradient(135deg,var(--blue),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{font-size:17px;color:var(--text2);max-width:520px;margin:0 auto 32px;animation:fadeUp 0.5s 0.15s ease both;font-weight:400;}
+.hero-btns{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;animation:fadeUp 0.5s 0.22s ease both;}
+.btn-main{background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff;padding:13px 24px;border-radius:var(--radius);font-size:15px;font-weight:600;text-decoration:none;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px;border:none;cursor:pointer;font-family:'Inter',sans-serif;}
+.btn-main:hover{opacity:0.9;transform:translateY(-2px);box-shadow:0 10px 36px rgba(217,70,239,0.25);}
+.btn-out{background:transparent;color:var(--text);padding:13px 24px;border-radius:var(--radius);font-size:15px;font-weight:600;text-decoration:none;transition:all 0.2s;border:1px solid var(--border2);display:inline-flex;align-items:center;gap:7px;}
+.btn-out:hover{border-color:var(--accent3);color:var(--accent3);}
+.hero-note{font-size:12px;color:var(--text3);margin-top:14px;animation:fadeUp 0.5s 0.28s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* STATS */
+.stats{padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.stats-row{display:flex;justify-content:center;gap:52px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-n{font-size:32px;font-weight:800;color:var(--text);line-height:1;}
+.stat-n .hi{color:var(--accent3);}
+.stat-l{font-size:12px;color:var(--text3);margin-top:3px;}
+
+/* GENERATE SECTION */
+.gen-sec{padding:80px 0;} 
+.sec-head{text-align:center;margin-bottom:44px;}
+.sec-tag{display:inline-block;background:rgba(217,70,239,0.08);border:1px solid rgba(217,70,239,0.18);color:var(--accent3);font-size:11px;font-weight:700;padding:3px 12px;border-radius:100px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;}
+.sec-head h2{font-size:clamp(24px,3.5vw,38px);font-weight:700;letter-spacing:-0.5px;margin-bottom:12px;}
+.sec-head p{font-size:15px;color:var(--text2);max-width:460px;margin:0 auto;}
+
+/* APP CARD */
+.app-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;overflow:hidden;}
+.app-tabs{display:flex;border-bottom:1px solid var(--border);}
+.app-tab{padding:14px 20px;font-size:14px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;user-select:none;}
+.app-tab.active{color:var(--accent3);border-bottom-color:var(--accent);}
+.app-tab:hover:not(.active){color:var(--text2);}
+.app-body{padding:28px;}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ff{grid-column:1/-1;}
+.fld{display:flex;flex-direction:column;gap:6px;}
+label{font-size:12px;font-weight:500;color:var(--text2);}
+label .r{color:var(--accent3);font-size:10px;margin-left:3px;}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;padding:10px 12px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:rgba(217,70,239,0.35);box-shadow:0 0 0 3px rgba(217,70,239,0.07);}
+select{cursor:pointer;}select option{background:var(--surface2);}
+textarea{resize:vertical;min-height:80px;line-height:1.5;}
+.tones{display:flex;gap:6px;flex-wrap:wrap;}
+.tone{padding:6px 12px;border-radius:100px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.18s;user-select:none;}
+.tone:hover{border-color:var(--border2);color:var(--text);}
+.tone.on{background:rgba(217,70,239,0.1);border-color:rgba(217,70,239,0.3);color:var(--accent3);}
+.gen-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;margin-top:8px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden;}
+.gen-btn:hover:not(:disabled){opacity:0.9;transform:translateY(-1px);box-shadow:0 8px 28px rgba(217,70,239,0.25);}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;}
+.sm-btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;transition:all 0.18s;}
+.sm-btn:hover{border-color:var(--border2);color:var(--text);}
+.sm-btn.done{border-color:rgba(217,70,239,0.3);color:var(--accent3);}
+.out-sec{margin-top:22px;}
+.out-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
+.out-title{font-size:13px;font-weight:600;}
+.out-acts{display:flex;gap:6px;}
+.out-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;min-height:148px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-wrap;}
+.out-ph{color:var(--text3);display:flex;align-items:center;justify-content:center;min-height:148px;flex-direction:column;gap:10px;text-align:center;}
+.ldots{display:flex;gap:5px;align-items:center;}
+.ldots span{width:7px;height:7px;border-radius:50%;background:var(--accent3);opacity:.3;animation:dt 1.2s ease infinite;}
+.ldots span:nth-child(2){animation-delay:.2s}.ldots span:nth-child(3){animation-delay:.4s}
+@keyframes dt{0%,80%,100%{transform:scale(.8);opacity:.3}40%{transform:scale(1.2);opacity:1}}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+.cur{display:inline-block;width:2px;height:13px;background:var(--accent3);margin-left:2px;vertical-align:middle;animation:bl 0.8s ease infinite;}
+.sc-bar{margin-top:10px;display:flex;align-items:center;gap:9px;}
+.sc-lbl{font-size:11px;color:var(--text3);white-space:nowrap;}
+.sc-trk{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.sc-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));border-radius:2px;width:0%;transition:width 1s ease 0.3s;}
+.sc-num{font-size:11px;font-weight:600;color:var(--accent3);min-width:28px;text-align:right;}
+.wc{font-size:10px;color:var(--text3);margin-top:5px;text-align:right;}
+.err{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.18);color:var(--red);border-radius:8px;padding:10px 13px;font-size:12px;margin-top:6px;display:none;}
+.err.on{display:block;}
+.tri-banner{border-radius:var(--radius);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;background:rgba(56,189,248,0.06);border:1px solid rgba(56,189,248,0.15);}
+.tri-txt{font-size:12px;color:var(--blue2);}
+.tri-cnt{font-size:18px;font-weight:700;color:var(--blue2);white-space:nowrap;}
+
+/* HOW IT WORKS */
+.how-sec{padding:80px 0;background:var(--bg2);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:28px;transition:all 0.3s;position:relative;overflow:hidden;}
+.step::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,189,248,0.04),rgba(217,70,239,0.04));opacity:0;transition:opacity 0.3s;}
+.step:hover{border-color:rgba(217,70,239,0.2);transform:translateY(-3px);}
+.step:hover::before{opacity:1;}
+.step-lbl{font-size:10px;font-weight:700;color:var(--accent3);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.step-ico{font-size:28px;margin-bottom:16px;}
+.step h3{font-size:18px;font-weight:700;margin-bottom:7px;}
+.step p{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* REVIEWS */
+.rev-sec{padding:80px 0;}
+.rating-top{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:40px;}
+.rating-big{font-size:48px;font-weight:800;}
+.stars-row{color:var(--gold);font-size:17px;letter-spacing:2px;}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.rev{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;transition:all 0.3s;position:relative;}
+.rev:hover{border-color:rgba(217,70,239,0.18);transform:translateY(-3px);}
+.rev-badge{position:absolute;top:16px;right:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;}
+.rev-stars{color:var(--gold);font-size:11px;margin-bottom:9px;}
+.rev-q{font-size:32px;color:var(--accent);line-height:1;margin-bottom:8px;font-family:serif;}
+.rev-txt{font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;}
+.rev-auth{display:flex;align-items:center;gap:9px;}
+.rev-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#fff;flex-shrink:0;}
+.rev-nm{font-weight:600;font-size:13px;}
+.rev-rl{font-size:11px;color:var(--text3);}
+
+/* PRICING */
+.price-sec{padding:80px 0;background:var(--bg2);}
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:860px;margin:0 auto;}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;transition:all 0.3s;position:relative;}
+.pc.hot{border-color:rgba(217,70,239,0.4);background:linear-gradient(135deg,rgba(217,70,239,0.07),var(--surface));}
+.pc.hot::before{content:'Most Popular';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff;font-size:11px;font-weight:700;padding:3px 13px;border-radius:100px;white-space:nowrap;}
+.pc:hover{transform:translateY(-3px);}
+.pc-nm{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.pc-amt{font-size:44px;font-weight:800;color:var(--text);line-height:1;margin-bottom:3px;}
+.pc-amt span{font-size:15px;font-weight:500;color:var(--text2);}
+.pc-per{font-size:12px;color:var(--text3);margin-bottom:24px;}
+.pc-feats{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:26px;}
+.pc-feats li{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:7px;}
+.pc-feats li::before{content:'✓';color:var(--green);font-weight:700;font-size:12px;flex-shrink:0;}
+.pc-feats li.x::before{content:'✗';color:var(--text3);}
+.pc-feats li.x{color:var(--text3);}
+.pbtn{width:100%;padding:12px;border-radius:var(--radius);font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;text-align:center;text-decoration:none;display:block;font-family:'Inter',sans-serif;}
+.pbtn-main{background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff;}
+.pbtn-main:hover{opacity:0.9;transform:translateY(-1px);}
+.pbtn-out{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
+.pbtn-out:hover{border-color:var(--accent3);color:var(--accent3);}
+
+/* FAQ */
+.faq-sec{padding:80px 0;}
+.faq-wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:9px;}
+.fq{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all 0.3s;}
+.fq.open{border-color:rgba(217,70,239,0.22);}
+.fq-q{padding:17px 20px;font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;transition:color 0.2s;}
+.fq-q:hover{color:var(--accent3);}
+.fq-arr{font-size:15px;color:var(--text3);transition:transform 0.3s;}
+.fq.open .fq-arr{transform:rotate(180deg);color:var(--accent3);}
+.fq-a{max-height:0;overflow:hidden;transition:max-height 0.35s ease;}
+.fq-ai{padding:0 20px 17px;font-size:13px;color:var(--text2);line-height:1.7;}
+.fq.open .fq-a{max-height:240px;}
+
+/* CTA */
+.cta-sec{padding:80px 0;}
+.cta-box{background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(217,70,239,0.08));border:1px solid rgba(217,70,239,0.18);border-radius:22px;padding:56px;text-align:center;position:relative;overflow:hidden;}
+.cta-box h2{font-size:clamp(24px,3.5vw,38px);font-weight:700;letter-spacing:-0.5px;margin-bottom:12px;}
+.cta-box p{font-size:15px;color:var(--text2);margin-bottom:28px;max-width:440px;margin-left:auto;margin-right:auto;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:40px 0 26px;}
+.ft-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px;}
+.ft-logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;margin-bottom:12px;}
+.ft-logo img{width:28px;height:28px;border-radius:6px;}
+.ft-desc{font-size:13px;color:var(--text3);line-height:1.6;max-width:220px;}
+.ft-col h5{font-size:11px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:13px;}
+.ft-col a{display:block;font-size:13px;color:var(--text3);text-decoration:none;margin-bottom:8px;transition:color 0.2s;}
+.ft-col a:hover{color:var(--text);}
+.ft-bot{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--text3);}
+
+/* PAYWALL */
+.pw-ov{position:fixed;inset:0;z-index:100;background:rgba(10,0,20,0.94);display:flex;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(8px);}
+.pw-card{background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:40px 36px;max-width:440px;width:100%;text-align:center;box-shadow:0 0 70px rgba(217,70,239,0.1);animation:fadeUp 0.4s ease both;}
+.pw-ico{font-size:40px;margin-bottom:13px;}
+.pw-card h2{font-size:22px;font-weight:700;margin-bottom:8px;}
+.pw-card p{color:var(--text2);font-size:14px;line-height:1.6;margin-bottom:20px;}
+.pw-price{display:inline-flex;align-items:baseline;gap:3px;margin-bottom:20px;}
+.pw-cur{font-size:17px;font-weight:700;color:var(--accent3);align-self:flex-start;margin-top:5px;}
+.pw-amt{font-size:46px;font-weight:800;color:var(--accent3);line-height:1;}
+.pw-per{font-size:13px;color:var(--text2);}
+.pw-feats{text-align:left;margin-bottom:20px;display:flex;flex-direction:column;gap:8px;}
+.pw-feat{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);}
+.pw-feat::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+.pay-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--accent));color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;margin-bottom:9px;}
+.pay-btn:hover{opacity:0.9;transform:translateY(-1px);}
+.pw-note{font-size:11px;color:var(--text3);}
+.stripe-info{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:11px;font-size:11px;color:var(--text3);}
+
+/* HISTORY & TIPS */
+.hist-list{display:flex;flex-direction:column;gap:9px;}
+.hist-item{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:13px 16px;cursor:pointer;transition:all 0.2s;}
+.hist-item:hover{border-color:var(--border2);}
+.hist-meta{display:flex;justify-content:space-between;margin-bottom:4px;}
+.hist-niche{font-size:11px;font-weight:600;color:var(--accent3);text-transform:uppercase;letter-spacing:.5px;}
+.hist-time{font-size:10px;color:var(--text3);}
+.hist-prev{font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.empty-h{text-align:center;padding:40px 0;color:var(--text3);font-size:13px;}
+.tips-list{display:flex;flex-direction:column;gap:11px;}
+.tip{display:flex;gap:13px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:15px;}
+.tip-n{width:24px;height:24px;border-radius:50%;background:rgba(217,70,239,0.1);border:1px solid rgba(217,70,239,0.22);color:var(--accent3);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tip-t h4{font-size:13px;font-weight:600;margin-bottom:3px;}
+.tip-t p{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid rgba(217,70,239,0.22);color:var(--accent3);padding:10px 16px;border-radius:8px;font-size:13px;font-weight:500;transform:translateY(70px);opacity:0;transition:all 0.3s ease;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.4);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity 0.5s ease,transform 0.5s ease;}
+.rv.vis{opacity:1;transform:translateY(0);}
+
+@media(max-width:768px){
+  .steps,.rev-grid,.price-grid{grid-template-columns:1fr;}
+  .fg{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .ft-inner{grid-template-columns:1fr 1fr;}
+  .stats-row{gap:24px;}
+  .app-body{padding:16px;}
+  .cta-box{padding:32px 18px;}
+  .hero{padding:56px 0 40px;}
+  .hero h1{font-size:32px;}
+}
 </style>
 </head>
 <body>
 
-<div class="paywall-overlay" id="paywall" style="display:none">
-  <div class="paywall-card">
-    <div class="paywall-icon">⚡</div>
+<!-- PAYWALL -->
+<div class="pw-ov" id="paywall" style="display:none">
+  <div class="pw-card">
+    <div class="pw-ico">⚡</div>
     <h2>Unlock ColdCraft AI</h2>
-    <p>You've used your 3 free emails. Upgrade to Pro for unlimited cold emails that get replies.</p>
-    <div class="price-tag"><span class="price-currency">$</span><span class="price-amount">5</span><span class="price-period">/month</span></div>
-    <div class="price-features">
-      <div class="price-feature">Unlimited cold email generation</div>
-      <div class="price-feature">All tones, niches &amp; industries</div>
-      <div class="price-feature">Full email history saved</div>
-      <div class="price-feature">New templates added monthly</div>
-      <div class="price-feature">Cancel anytime — no contracts</div>
+    <p>You've used your 3 free emails. Upgrade to Pro for unlimited cold emails that get real replies.</p>
+    <div class="pw-price"><span class="pw-cur">$</span><span class="pw-amt">5</span><span class="pw-per">/month</span></div>
+    <div class="pw-feats">
+      <div class="pw-feat">Unlimited cold email generation</div>
+      <div class="pw-feat">All tones, niches &amp; industries</div>
+      <div class="pw-feat">Full email history saved</div>
+      <div class="pw-feat">New templates every month</div>
+      <div class="pw-feat">Cancel anytime — no contracts</div>
     </div>
-    <button class="btn-pay" onclick="startCheckout()">Get Pro — $5/month</button>
-    <div class="paywall-note">Secure checkout · Cancel anytime · <a href="#">Privacy Policy</a></div>
-    <div class="stripe-badge">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect width="14" height="14" rx="3" fill="#635BFF"/><path d="M5.8 5.2c0-.4.3-.6.8-.6.7 0 1.4.2 2 .5V3.5C8 3.2 7.3 3 6.6 3 5 3 3.9 3.8 3.9 5.3c0 2.2 3 1.9 3 2.8 0 .5-.4.6-.9.6-.8 0-1.6-.3-2.3-.7v1.6c.7.3 1.5.4 2.3.4 1.6 0 2.7-.8 2.7-2.3-.1-2.4-3-2-3-2.7z" fill="white"/></svg>
-      Powered by Stripe · Accepted in 195+ countries
+    <button class="pay-btn" onclick="startCheckout()">Get Pro — $5/month</button>
+    <div class="pw-note">Secure checkout · Cancel anytime · <a href="#" style="color:var(--text2)">Privacy</a></div>
+    <div class="stripe-info">
+      <svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect width="14" height="14" rx="3" fill="#635BFF"/><path d="M5.8 5.2c0-.4.3-.6.8-.6.7 0 1.4.2 2 .5V3.5C8 3.2 7.3 3 6.6 3 5 3 3.9 3.8 3.9 5.3c0 2.2 3 1.9 3 2.8 0 .5-.4.6-.9.6-.8 0-1.6-.3-2.3-.7v1.6c.7.3 1.5.4 2.3.4 1.6 0 2.7-.8 2.7-2.3-.1-2.4-3-2-3-2.7z" fill="white"/></svg>
+      Stripe · Accepted in 195+ countries
     </div>
   </div>
 </div>
 
-<div class="wrap">
-  <nav>
-    <div class="logo"><img src="/logo.png" style="width:32px;height:32px;border-radius:6px;margin-right:8px;vertical-align:middle">ColdCraft AI</div>
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <div class="nav-inner">
+      <a href="#" class="logo"><img src="/logo.png" alt="ColdCraft AI"/>ColdCraft AI</a>
+      <div class="nav-links">
+        <a href="#generate">Generate</a>
+        <a href="#how">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="nav-right">
+        <div class="plan-pill" id="plan-pill">Free Plan</div>
+        <a href="#generate" class="nav-cta">Get Started Free</a>
+      </div>
+    </div>
+  </div>
+</nav>
 
-<title>ColdCraft AI — Cold Email Generator</title>
-  <link rel="icon" href="/logo.png" type="image/png">
-    <div class="nav-right">
-      <div class="nav-badge">✦ AI Powered</div>
-      <div class="plan-badge plan-free" id="plan-indicator">Free Plan</div>
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Trusted by 1,200+ professionals worldwide</div>
+    <h1>Cold emails that<br>actually <span class="hl">get replies</span></h1>
+    <p class="hero-sub">Generate hyper-personalized cold emails in seconds. Fill in your details, pick your tone and let AI do the rest.</p>
+    <div class="hero-btns">
+      <a href="#generate" class="btn-main">Generate Free Emails ↓</a>
+      <a href="#how" class="btn-out">See How It Works →</a>
     </div>
-  </nav>
-  <div class="hero">
-    <div class="hero-tag"><span></span> Smart Email Intelligence</div>
-    <h1>Cold emails that<br>actually <em>get replies</em></h1>
-    <p class="hero-sub">Generate hyper-personalized cold emails in seconds. Built for freelancers, agencies &amp; founders worldwide.</p>
+    <p class="hero-note">No signup required · 3 free per day</p>
   </div>
-  <div class="stats">
-    <div class="stat"><div class="stat-num" id="stat-gen">0</div><div class="stat-label">Emails generated</div></div>
-    <div class="stat"><div class="stat-num">~45%</div><div class="stat-label">Avg open rate</div></div>
-    <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Time to write</div></div>
-    <div class="stat"><div class="stat-num">12+</div><div class="stat-label">Industries</div></div>
-  </div>
-  <div class="app-card">
-    <div class="card-header">
-      <div class="tab active" onclick="switchTab('generate',this)">✦ Generate</div>
-      <div class="tab" onclick="switchTab('history',this)">History</div>
-      <div class="tab" onclick="switchTab('tips',this)">Pro Tips</div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stats-row">
+      <div class="stat"><div class="stat-n"><span class="hi" id="c1">10</span>K+</div><div class="stat-l">Emails generated</div></div>
+      <div class="stat"><div class="stat-n"><span class="hi" id="c2">48</span>%</div><div class="stat-l">Avg. open rate</div></div>
+      <div class="stat"><div class="stat-n"><span class="hi">4.9</span>★</div><div class="stat-l">Average rating</div></div>
+      <div class="stat"><div class="stat-n"><span class="hi" id="c3">1200</span>+</div><div class="stat-l">Happy users</div></div>
     </div>
-    <div id="tab-generate" class="card-body">
-      <div class="trial-banner" id="trial-banner">
-        <div class="trial-text" id="trial-text"><strong>Free trial active</strong><br><span id="trial-sub">Try ColdCraft AI free — no credit card needed</span></div>
-        <div class="trial-count" id="trial-count">3 left</div>
+  </div>
+</section>
+
+<!-- GENERATE SECTION -->
+<section class="gen-sec" id="generate">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">Generate Now</div>
+      <h2>Generate Personalized Emails</h2>
+      <p>Fill in your details below. We'll craft a personalized cold email that gets replies.</p>
+    </div>
+    <div class="app-card rv">
+      <div class="app-tabs">
+        <div class="app-tab active" onclick="switchTab('generate',this)">✦ Generate</div>
+        <div class="app-tab" onclick="switchTab('history',this)">History</div>
+        <div class="app-tab" onclick="switchTab('tips',this)">Pro Tips</div>
       </div>
-      <div class="form-grid">
-        <div class="field"><label>Your name / company <span class="req">required</span></label><input type="text" id="sender" placeholder="e.g. Alex from GrowthLab"/></div>
-        <div class="field"><label>Your niche / service <span class="req">required</span></label>
-          <select id="niche"><option value="">Select your niche...</option><option>Freelance developer</option><option>Digital marketing agency</option><option>SaaS product</option><option>Copywriter / content writer</option><option>Graphic / UI designer</option><option>Sales consultant</option><option>Recruitment / HR</option><option>Real estate agent</option><option>Financial advisor</option><option>Coach / consultant</option><option>E-commerce brand</option><option>Other</option></select>
+      <div id="tab-generate" class="app-body">
+        <div class="tri-banner" id="tri-banner">
+          <div class="tri-txt" id="tri-txt"><strong>Free trial active</strong><br><span id="tri-sub">3 free emails daily — no credit card needed</span></div>
+          <div class="tri-cnt" id="tri-cnt">3 left</div>
         </div>
-        <div class="field"><label>Target prospect <span class="req">required</span></label><input type="text" id="prospect" placeholder="e.g. Marketing Manager at a SaaS startup"/></div>
-        <div class="field"><label>Their company / industry</label><input type="text" id="company" placeholder="e.g. E-commerce company in USA"/></div>
-        <div class="field form-full"><label>Your value proposition <span class="req">required</span></label><textarea id="offer" placeholder="e.g. I help e-commerce brands increase revenue by 30% with automated email funnels. Done this for 20+ brands."></textarea></div>
-        <div class="field"><label>Goal of this email</label>
-          <select id="goal"><option value="book a discovery call">Book a discovery call</option><option value="get a reply">Get a reply</option><option value="share a case study">Share a case study</option><option value="offer a free audit">Offer a free audit</option><option value="demo the product">Demo the product</option></select>
-        </div>
-        <div class="field"><label>Email length</label>
-          <select id="length"><option value="short (under 100 words)">Short — under 100 words</option><option value="medium (120–150 words)" selected>Medium — 120–150 words</option><option value="detailed (180–220 words)">Detailed — 180–220 words</option></select>
-        </div>
-        <div class="field form-full"><label>Email tone</label>
-          <div class="tone-grid">
-            <div class="tone-btn active" onclick="selectTone(this)">Professional</div>
-            <div class="tone-btn" onclick="selectTone(this)">Casual &amp; Friendly</div>
-            <div class="tone-btn" onclick="selectTone(this)">Bold &amp; Direct</div>
-            <div class="tone-btn" onclick="selectTone(this)">Curious &amp; Creative</div>
-            <div class="tone-btn" onclick="selectTone(this)">Empathetic</div>
+        <div class="fg">
+          <div class="fld"><label>Your name / company <span class="r">required</span></label><input type="text" id="sender" placeholder="e.g. Alex from GrowthLab"/></div>
+          <div class="fld"><label>Your niche / service <span class="r">required</span></label>
+            <select id="niche"><option value="">Select your niche...</option><option>Freelance developer</option><option>Digital marketing agency</option><option>SaaS product</option><option>Copywriter / content writer</option><option>Graphic / UI designer</option><option>Sales consultant</option><option>Recruitment / HR</option><option>Real estate agent</option><option>Financial advisor</option><option>Coach / consultant</option><option>E-commerce brand</option><option>Other</option></select>
+          </div>
+          <div class="fld"><label>Target prospect <span class="r">required</span></label><input type="text" id="prospect" placeholder="e.g. Marketing Manager at a SaaS startup"/></div>
+          <div class="fld"><label>Their company / industry</label><input type="text" id="company" placeholder="e.g. E-commerce company in USA"/></div>
+          <div class="fld ff"><label>Your value proposition <span class="r">required</span></label><textarea id="offer" placeholder="e.g. I help e-commerce brands increase revenue by 30% with automated email funnels. Done this for 20+ brands."></textarea></div>
+          <div class="fld"><label>Goal of this email</label>
+            <select id="goal"><option value="book a discovery call">Book a discovery call</option><option value="get a reply">Get a reply</option><option value="share a case study">Share a case study</option><option value="offer a free audit">Offer a free audit</option><option value="demo the product">Demo the product</option></select>
+          </div>
+          <div class="fld"><label>Email length</label>
+            <select id="length"><option value="short (under 100 words)">Short — under 100 words</option><option value="medium (120–150 words)" selected>Medium — 120–150 words</option><option value="detailed (180–220 words)">Detailed — 180–220 words</option></select>
+          </div>
+          <div class="fld ff"><label>Email tone</label>
+            <div class="tones">
+              <div class="tone on" onclick="setTone(this)">Professional</div>
+              <div class="tone" onclick="setTone(this)">Casual &amp; Friendly</div>
+              <div class="tone" onclick="setTone(this)">Bold &amp; Direct</div>
+              <div class="tone" onclick="setTone(this)">Curious &amp; Creative</div>
+              <div class="tone" onclick="setTone(this)">Empathetic</div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="error-msg" id="error-msg">Please fill in your name, niche, prospect and value proposition.</div>
-      <button class="btn-generate" id="gen-btn" onclick="generateEmail()" style="margin-top:22px"><span id="btn-text">⚡ Generate Cold Email</span></button>
-      <div class="output-section" id="output-section" style="display:none">
-        <div class="output-header">
-          <div class="output-title">Your Cold Email</div>
-          <div class="output-actions">
-            <button class="btn-sm" onclick="generateEmail()">↺ Regenerate</button>
-            <button class="btn-sm" id="copy-btn" onclick="copyEmail()">Copy</button>
+        <div class="err" id="err-msg">Please fill in your name, niche, prospect and value proposition.</div>
+        <button class="gen-btn" id="gen-btn" onclick="generateEmail()" style="margin-top:18px"><span id="btn-txt">Generate Emails ✨</span></button>
+        <div class="out-sec" id="out-sec" style="display:none">
+          <div class="out-hdr"><div class="out-title">Your Cold Email</div><div class="out-acts"><button class="sm-btn" onclick="generateEmail()">↺ Regenerate</button><button class="sm-btn" id="copy-btn" onclick="copyEmail()">Copy</button></div></div>
+          <div class="out-box">
+            <div class="out-ph" id="out-ph"><div class="ldots"><span></span><span></span><span></span></div><div>Crafting your email...</div></div>
+            <div id="out-txt" style="display:none"></div>
           </div>
+          <div class="sc-bar" id="sc-bar" style="display:none"><div class="sc-lbl">Email quality</div><div class="sc-trk"><div class="sc-fill" id="sc-fill"></div></div><div class="sc-num" id="sc-num">0%</div></div>
+          <div class="wc" id="wc"></div>
         </div>
-        <div class="output-box">
-          <div class="output-placeholder" id="output-placeholder"><div class="loading-dots"><span></span><span></span><span></span></div><div>Crafting your email...</div></div>
-          <div id="output-text" style="display:none"></div>
-        </div>
-        <div class="score-bar" id="score-bar" style="display:none">
-          <div class="score-label">Email quality</div>
-          <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
-          <div class="score-num" id="score-num">0%</div>
-        </div>
-        <div class="word-count" id="word-count"></div>
       </div>
-    </div>
-    <div id="tab-history" class="card-body" style="display:none">
-      <div class="history-list" id="history-list"><div class="empty-history">No emails yet. Generate your first one!</div></div>
-    </div>
-    <div id="tab-tips" class="card-body" style="display:none">
-      <div class="tips-list">
-        <div class="tip-item"><div class="tip-num">1</div><div class="tip-text"><h4>Be specific about their industry</h4><p>Instead of "small business", try "e-commerce brand selling fitness products in the US". Specificity builds trust instantly.</p></div></div>
-        <div class="tip-item"><div class="tip-num">2</div><div class="tip-text"><h4>One clear call to action only</h4><p>Don't ask them to book a call AND reply AND visit your website. Pick one CTA and commit to it every time.</p></div></div>
-        <div class="tip-item"><div class="tip-num">3</div><div class="tip-text"><h4>Casual &amp; Friendly tone outperforms formal</h4><p>Executives get hundreds of corporate emails daily. A human, conversational tone stands out far more.</p></div></div>
-        <div class="tip-item"><div class="tip-num">4</div><div class="tip-text"><h4>Keep it under 120 words</h4><p>Decision-makers skim on mobile. Short and punchy beats long every time.</p></div></div>
-        <div class="tip-item"><div class="tip-num">5</div><div class="tip-text"><h4>Add a social proof number</h4><p>"I've helped 15 SaaS companies double demo bookings in 90 days" — numbers build instant trust.</p></div></div>
-        <div class="tip-item"><div class="tip-num">6</div><div class="tip-text"><h4>Always follow up 2–3 times</h4><p>80% of deals happen after the 5th contact. Send follow-ups 3–5 days apart.</p></div></div>
+      <div id="tab-history" class="app-body" style="display:none"><div class="hist-list" id="hist-list"><div class="empty-h">No emails yet. Generate your first one!</div></div></div>
+      <div id="tab-tips" class="app-body" style="display:none">
+        <div class="tips-list">
+          <div class="tip"><div class="tip-n">1</div><div class="tip-t"><h4>Be specific about their industry</h4><p>Instead of "small business" try "e-commerce brand selling fitness products in the US". Specificity builds trust instantly.</p></div></div>
+          <div class="tip"><div class="tip-n">2</div><div class="tip-t"><h4>One clear CTA only</h4><p>Never ask them to book a call AND reply AND visit your site. One ask per email — always.</p></div></div>
+          <div class="tip"><div class="tip-n">3</div><div class="tip-t"><h4>Casual beats formal every time</h4><p>Executives get hundreds of corporate emails daily. A human tone stands out far more.</p></div></div>
+          <div class="tip"><div class="tip-n">4</div><div class="tip-t"><h4>Keep it under 120 words</h4><p>Decision-makers skim on mobile. Short and punchy beats long every single time.</p></div></div>
+          <div class="tip"><div class="tip-n">5</div><div class="tip-t"><h4>Add a specific number</h4><p>"Helped 15 SaaS companies double demo bookings in 90 days" — numbers build instant credibility.</p></div></div>
+          <div class="tip"><div class="tip-n">6</div><div class="tip-t"><h4>Follow up 2–3 times</h4><p>80% of deals happen after the 5th contact. Send follow-ups 3–5 days apart.</p></div></div>
+        </div>
       </div>
     </div>
   </div>
-  <footer>
-    <p>ColdCraft AI &nbsp;·&nbsp; <a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms of Service</a> &nbsp;·&nbsp; <a href="#">Support</a></p>
-    <p style="margin-top:6px;font-size:12px">&copy; 2025 ColdCraft AI · All rights reserved</p>
-  </footer>
-</div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-sec" id="how">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">How It Works</div>
+      <h2>Three steps. Ten seconds.<br>Emails that convert.</h2>
+      <p>No more blank screen staring. Our AI handles the research and writing so you focus on closing.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv">
+        <div class="step-lbl">Step 01</div>
+        <div class="step-ico">📝</div>
+        <h3>Enter your details</h3>
+        <p>Fill in your niche, who you are targeting, and what value you bring. Takes under 60 seconds.</p>
+      </div>
+      <div class="step rv" style="transition-delay:.1s">
+        <div class="step-lbl">Step 02</div>
+        <div class="step-ico">🤖</div>
+        <h3>AI writes your email</h3>
+        <p>Our AI crafts a personalized cold email using battle-tested copywriting frameworks that drive responses.</p>
+      </div>
+      <div class="step rv" style="transition-delay:.2s">
+        <div class="step-lbl">Step 03</div>
+        <div class="step-ico">📨</div>
+        <h3>Send and receive replies</h3>
+        <p>Copy, send, and watch the replies arrive. Generate unlimited variations until you find the perfect one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="rev-sec" id="reviews">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">Reviews</div>
+      <h2>Loved by professionals worldwide</h2>
+    </div>
+    <div class="rating-top rv">
+      <div class="rating-big">4.9</div>
+      <div><div class="stars-row">★★★★★</div><div style="font-size:11px;color:var(--text3);margin-top:3px">Based on 340+ reviews</div></div>
+    </div>
+    <div class="rev-grid">
+      <div class="rev rv"><div class="rev-badge">3x more replies</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">I used to take 20 minutes writing each outreach email. ColdCraft AI does it in seconds and honestly the results are better than what I used to send myself. My reply rate jumped from 4% to 18%.</p><div class="rev-auth"><div class="rev-av">S</div><div><div class="rev-nm">Sarah K.</div><div class="rev-rl">SDR at a SaaS startup, USA</div></div></div></div>
+      <div class="rev rv" style="transition-delay:.1s"><div class="rev-badge">Deal closed in 3 days</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">The quality blew me away. My prospect actually replied saying it was the best outreach email they had ever received. Closed the deal a week after. This tool is worth every cent.</p><div class="rev-auth"><div class="rev-av">M</div><div><div class="rev-nm">Marcus T.</div><div class="rev-rl">Freelance consultant, UK</div></div></div></div>
+      <div class="rev rv" style="transition-delay:.2s"><div class="rev-badge">48% open rate</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">Ran a month-long test comparing my own templates vs ColdCraft AI emails. The AI version got 48% open rate vs my usual 19%. The gap is huge. Using it for every client campaign now.</p><div class="rev-auth"><div class="rev-av">J</div><div><div class="rev-nm">Jessica R.</div><div class="rev-rl">Agency owner, Australia</div></div></div></div>
+      <div class="rev rv" style="transition-delay:.1s"><div class="rev-badge">12 calls booked</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">As a solo founder there is just no time for manual outreach. ColdCraft AI helped me generate 10 personalized emails in the time it used to take to write one. Booked 12 discovery calls in week one.</p><div class="rev-auth"><div class="rev-av">R</div><div><div class="rev-nm">Rahul M.</div><div class="rev-rl">SaaS Founder, India</div></div></div></div>
+      <div class="rev rv" style="transition-delay:.2s"><div class="rev-badge">10 hours saved weekly</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">Our five-person team saves at least 10 hours every week using this. The output is consistently sharp and we can dial in the tone depending on who we are reaching out to.</p><div class="rev-auth"><div class="rev-av">L</div><div><div class="rev-nm">Lena W.</div><div class="rev-rl">Sales Director, Germany</div></div></div></div>
+      <div class="rev rv" style="transition-delay:.3s"><div class="rev-badge">5x ROI in month 1</div><div class="rev-stars">★★★★★</div><div class="rev-q">"</div><p class="rev-txt">Was not expecting much but the emails read completely human. Prospects respond like they were written personally for them. Hit 5x ROI in my first month as a freelance designer using this.</p><div class="rev-auth"><div class="rev-av">A</div><div><div class="rev-nm">Arjun P.</div><div class="rev-rl">Freelance Designer, Singapore</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="price-sec" id="pricing">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">Pricing</div>
+      <h2>Simple, honest pricing</h2>
+      <p>One cold email that lands a deal pays for a full year of ColdCraft AI.</p>
+    </div>
+    <div class="price-grid">
+      <div class="pc rv">
+        <div class="pc-nm">Free</div>
+        <div class="pc-amt">$0</div>
+        <div class="pc-per">forever</div>
+        <ul class="pc-feats">
+          <li>3 generations / day</li>
+          <li>All tone styles</li>
+          <li>12+ niches supported</li>
+          <li>Email quality score</li>
+          <li class="x">Email history</li>
+          <li class="x">Unlimited regeneration</li>
+        </ul>
+        <a href="#generate" class="pbtn pbtn-out">Start Free</a>
+      </div>
+      <div class="pc hot rv" style="transition-delay:.1s">
+        <div class="pc-nm">Pro</div>
+        <div class="pc-amt">$5<span>/mo</span></div>
+        <div class="pc-per">billed monthly · cancel anytime</div>
+        <ul class="pc-feats">
+          <li>Unlimited generations</li>
+          <li>All tone styles</li>
+          <li>12+ niches supported</li>
+          <li>Email quality score</li>
+          <li>Full email history</li>
+          <li>Unlimited regeneration</li>
+        </ul>
+        <button class="pbtn pbtn-main" onclick="startCheckout()">Get Pro →</button>
+      </div>
+      <div class="pc rv" style="transition-delay:.2s">
+        <div class="pc-nm">Lifetime</div>
+        <div class="pc-amt">$29</div>
+        <div class="pc-per">one-time · yours forever</div>
+        <ul class="pc-feats">
+          <li>Everything in Pro</li>
+          <li>Lifetime access</li>
+          <li>All future updates</li>
+          <li>Priority support</li>
+          <li>Full email history</li>
+          <li>Unlimited regeneration</li>
+        </ul>
+        <button class="pbtn pbtn-out" onclick="startCheckout()">Get Lifetime →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-sec" id="faq">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="sec-tag">FAQ</div>
+      <h2>Common questions</h2>
+      <p>Everything you need to know about ColdCraft AI.</p>
+    </div>
+    <div class="faq-wrap">
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">How does ColdCraft AI personalize my emails? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">ColdCraft AI processes your prospect details, niche, value proposition and tone preference to generate a completely unique cold email that sounds natural and human — never like a template. Every email is freshly written.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">Is it really free to start? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">Yes. You get 3 free email generations every day with no signup required. No credit card needed. Upgrade to Pro for unlimited generations at just $5/month.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">Will recipients know AI wrote the email? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">No. Our AI is trained specifically for cold outreach — the emails read like you spent 30 minutes researching each prospect. Users consistently report replies that treat the email as personally written.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">Which industries are supported? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">ColdCraft AI covers 12+ industries including freelance development, digital marketing, SaaS, copywriting, design, sales, recruitment, real estate, finance, coaching, e-commerce and more. Select "Other" for anything not listed.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">Can I cancel my subscription anytime? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">Yes. Cancel anytime from your billing portal with no questions asked. You keep access until the end of your current billing period.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">Does it work for markets outside the USA? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">Absolutely. ColdCraft AI works for any country and market. Whether you are reaching prospects in the USA, UK, India, Europe, Australia or anywhere else — the emails are written to resonate with your specific audience.</div></div></div>
+      <div class="fq rv" onclick="toggleFaq(this)"><div class="fq-q">How is this different from using ChatGPT? <span class="fq-arr">▾</span></div><div class="fq-a"><div class="fq-ai">ColdCraft AI is purpose-built for cold outreach. It understands sales psychology, reply triggers, and what makes decision-makers respond. ChatGPT is a general tool — ColdCraft AI is a specialist built for one job: getting you replies.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="wrap">
+    <div class="cta-box rv">
+      <h2>Stop sending emails that get ignored</h2>
+      <p>Join 1,200+ professionals who are booking more meetings with AI-powered outreach. Start free today.</p>
+      <a href="#generate" class="btn-main" style="font-size:15px;padding:14px 30px">Try It Free Now ↑</a>
+      <p style="margin-top:12px;font-size:12px;color:var(--text3)">No signup required · 3 free per day · Works worldwide</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="ft-inner">
+      <div>
+        <div class="ft-logo"><img src="/logo.png" alt="ColdCraft AI"/>ColdCraft AI</div>
+        <p class="ft-desc">AI-powered cold email generation for professionals, founders and freelancers worldwide.</p>
+      </div>
+      <div class="ft-col"><h5>Product</h5><a href="#generate">Generate</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a><a href="#reviews">Reviews</a></div>
+      <div class="ft-col"><h5>Company</h5><a href="#">About</a><a href="#">Blog</a><a href="#">Contact</a><a href="#">Support</a></div>
+      <div class="ft-col"><h5>Legal</h5><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Cookie Policy</a></div>
+    </div>
+    <div class="ft-bot"><span>© 2025 ColdCraft AI · All rights reserved</span><span>AI-powered cold email personalization</span></div>
+  </div>
+</footer>
+
 <div class="toast" id="toast"></div>
 
 <script>
-  const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/REPLACE_WITH_YOUR_LINK';
-  const FREE_LIMIT = 3;
+const STRIPE_PAYMENT_LINK='https://buy.stripe.com/REPLACE_WITH_YOUR_LINK';
+const FREE_LIMIT=3;
+let tone='Professional';
+let hist=JSON.parse(localStorage.getItem('cc_history')||'[]');
+let curEmail='';
+let used=parseInt(localStorage.getItem('cc_used')||'0');
+let isPro=localStorage.getItem('cc_pro')==='true';
+let total=parseInt(localStorage.getItem('cc_total')||'0');
 
-  let tone = 'Professional';
-  let emailHistory = JSON.parse(localStorage.getItem('cc_history') || '[]');
-  let currentEmail = '';
-  let used  = parseInt(localStorage.getItem('cc_used')  || '0');
-  let isPro = localStorage.getItem('cc_pro') === 'true';
-  let total = parseInt(localStorage.getItem('cc_total') || '0');
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:0.08});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 
-  function init() {
-    refreshBanner(); refreshPlan(); animCounter();
-    const p = new URLSearchParams(location.search);
-    if (p.get('payment') === 'success') {
-      localStorage.setItem('cc_pro','true'); isPro=true;
-      refreshBanner(); refreshPlan();
-      toast('🎉 Welcome to Pro! Unlimited emails unlocked.');
-      history.replaceState({},'',' ');
-    }
-  }
+// FAQ
+function toggleFaq(item){const open=item.classList.contains('open');document.querySelectorAll('.fq').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open');}
 
-  function refreshBanner() {
-    const banner=document.getElementById('trial-banner');
-    const txt=document.getElementById('trial-text');
-    const cnt=document.getElementById('trial-count');
-    const sub=document.getElementById('trial-sub');
-    if (isPro) {
-      banner.style.background='linear-gradient(135deg,rgba(110,231,183,0.08),rgba(110,231,183,0.04))';
-      banner.style.borderColor='rgba(110,231,183,0.2)';
-      txt.innerHTML='<strong style="color:var(--accent)">Pro Plan Active</strong><br><span style="color:var(--accent)">Unlimited cold emails · Cancel anytime</span>';
-      cnt.style.display='none';
-    } else {
-      const left=Math.max(0,FREE_LIMIT-used);
-      cnt.textContent=left+' left';
-      if(left===0) sub.textContent='Free trial ended — upgrade to continue';
-      else if(left===1) sub.textContent='Last free email — upgrade for unlimited';
-      else sub.textContent='Try ColdCraft AI free — no card needed';
-    }
-  }
+function init(){
+  refreshBanner();refreshPlan();
+  const p=new URLSearchParams(location.search);
+  if(p.get('payment')==='success'){localStorage.setItem('cc_pro','true');isPro=true;refreshBanner();refreshPlan();showToast('🎉 Welcome to Pro! Unlimited emails unlocked.');history.replaceState({},'','/');}
+}
 
-  function refreshPlan() {
-    const b=document.getElementById('plan-indicator');
-    if(isPro){b.textContent='⚡ Pro Plan';b.className='plan-badge plan-pro';}
-    else{b.textContent='Free Plan';b.className='plan-badge plan-free';}
-  }
+function refreshBanner(){
+  const b=document.getElementById('tri-banner'),t=document.getElementById('tri-txt'),c=document.getElementById('tri-cnt'),s=document.getElementById('tri-sub');
+  if(isPro){b.style.background='rgba(16,185,129,0.07)';b.style.borderColor='rgba(16,185,129,0.18)';t.innerHTML='<strong style="color:#10b981">Pro Plan Active</strong><br><span style="color:#10b981">Unlimited cold emails · Cancel anytime</span>';c.style.display='none';}
+  else{const l=Math.max(0,FREE_LIMIT-used);c.textContent=l+' left';if(l===0)s.textContent='Free trial ended — upgrade to continue';else if(l===1)s.textContent='Last free email — upgrade for unlimited';else s.textContent=l+' free emails daily — no credit card needed';}
+}
 
-  function animCounter() {
-    const el=document.getElementById('stat-gen');
-    let c=0,step=Math.max(1,Math.floor(total/30));
-    const t=setInterval(()=>{c=Math.min(c+step,total);el.textContent=c;if(c>=total)clearInterval(t);},40);
-  }
+function refreshPlan(){
+  const b=document.getElementById('plan-pill');
+  if(isPro){b.textContent='⚡ Pro';b.style.cssText='background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.22);color:#10b981;font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;';}
+  else{b.textContent='Free Plan';b.style.cssText='background:rgba(217,70,239,0.08);border:1px solid rgba(217,70,239,0.22);color:var(--accent3);font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;';}
+}
 
-  function selectTone(el) {
-    document.querySelectorAll('.tone-btn').forEach(b=>b.classList.remove('active'));
-    el.classList.add('active'); tone=el.textContent;
-  }
+function setTone(el){document.querySelectorAll('.tone').forEach(b=>b.classList.remove('on'));el.classList.add('on');tone=el.textContent;}
 
-  function switchTab(tab,el) {
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    el.classList.add('active');
-    ['generate','history','tips'].forEach(t=>{
-      document.getElementById('tab-'+t).style.display=t===tab?'block':'none';
-    });
-    if(tab==='history') renderHistory();
-  }
+function switchTab(tab,el){
+  document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  ['generate','history','tips'].forEach(t=>{document.getElementById('tab-'+t).style.display=t===tab?'block':'none';});
+  if(tab==='history')renderHist();
+}
 
-  function renderHistory() {
-    const list=document.getElementById('history-list');
-    if(!emailHistory.length){list.innerHTML='<div class="empty-history">No emails yet. Generate your first one!</div>';return;}
-    list.innerHTML=emailHistory.slice().reverse().map((h,i)=>`
-      <div class="history-item" onclick="loadHistory(${emailHistory.length-1-i})">
-        <div class="history-meta"><div class="history-niche">${h.niche||'Custom'}</div><div class="history-time">${h.time}</div></div>
-        <div class="history-preview">${h.email.substring(0,120)}...</div>
-      </div>`).join('');
-  }
+function renderHist(){
+  const list=document.getElementById('hist-list');
+  if(!hist.length){list.innerHTML='<div class="empty-h">No emails yet. Generate your first one!</div>';return;}
+  list.innerHTML=hist.slice().reverse().map((h,i)=>`<div class="hist-item" onclick="loadHist(${hist.length-1-i})"><div class="hist-meta"><div class="hist-niche">${h.niche||'Custom'}</div><div class="hist-time">${h.time}</div></div><div class="hist-prev">${h.email.substring(0,110)}...</div></div>`).join('');
+}
 
-  function loadHistory(i) {
-    currentEmail=emailHistory[i].email;
-    switchTab('generate',document.querySelector('.tab'));
-    revealOutput(emailHistory[i].email,false);
-  }
+function loadHist(i){curEmail=hist[i].email;switchTab('generate',document.querySelector('.app-tab'));revealOut(hist[i].email,false);}
 
-  async function generateEmail() {
-    if(!isPro && used>=FREE_LIMIT){document.getElementById('paywall').style.display='flex';return;}
-    const sender=document.getElementById('sender').value.trim();
-    const niche=document.getElementById('niche').value;
-    const prospect=document.getElementById('prospect').value.trim();
-    const offer=document.getElementById('offer').value.trim();
-    const company=document.getElementById('company').value.trim();
-    const goal=document.getElementById('goal').value;
-    const length=document.getElementById('length').value;
-    const errEl=document.getElementById('error-msg');
-    if(!sender||!niche||!prospect||!offer){errEl.classList.add('show');setTimeout(()=>errEl.classList.remove('show'),3000);return;}
-    errEl.classList.remove('show');
+async function generateEmail(){
+  if(!isPro&&used>=FREE_LIMIT){document.getElementById('paywall').style.display='flex';return;}
+  const sender=document.getElementById('sender').value.trim();
+  const niche=document.getElementById('niche').value;
+  const prospect=document.getElementById('prospect').value.trim();
+  const offer=document.getElementById('offer').value.trim();
+  const company=document.getElementById('company').value.trim();
+  const goal=document.getElementById('goal').value;
+  const length=document.getElementById('length').value;
+  const errEl=document.getElementById('err-msg');
+  if(!sender||!niche||!prospect||!offer){errEl.classList.add('on');setTimeout(()=>errEl.classList.remove('on'),3000);return;}
+  errEl.classList.remove('on');
 
-    const btn=document.getElementById('gen-btn'),btnTxt=document.getElementById('btn-text');
-    btn.disabled=true;
-    btnTxt.innerHTML='<span style="display:flex;align-items:center;gap:8px"><span class="loading-dots"><span></span><span></span><span></span></span> Generating...</span>';
+  const btn=document.getElementById('gen-btn'),btnTxt=document.getElementById('btn-txt');
+  btn.disabled=true;
+  btnTxt.innerHTML='<span style="display:flex;align-items:center;gap:7px"><span class="ldots"><span></span><span></span><span></span></span>Generating...</span>';
 
-    document.getElementById('output-section').style.display='block';
-    document.getElementById('output-placeholder').style.display='flex';
-    document.getElementById('output-text').style.display='none';
-    document.getElementById('score-bar').style.display='none';
-    document.getElementById('word-count').textContent='';
-    document.getElementById('score-fill').style.width='0%';
+  document.getElementById('out-sec').style.display='block';
+  document.getElementById('out-ph').style.display='flex';
+  document.getElementById('out-txt').style.display='none';
+  document.getElementById('sc-bar').style.display='none';
+  document.getElementById('wc').textContent='';
+  document.getElementById('sc-fill').style.width='0%';
 
-    const prompt=`You are a world-class cold email copywriter who gets 30-50% reply rates.
+  const prompt=`You are a world-class cold email copywriter who gets 30-50% reply rates.
 
 Write a cold email:
 - Sender: ${sender}
@@ -375,91 +658,71 @@ ${company?`- Their industry: ${company}`:''}
 Rules:
 1. Start with "Subject: " then a compelling subject line
 2. Blank line then email body
-3. Human, natural voice — not a template
-4. Hook in first line (pain point or bold claim)
+3. Human natural voice — not a template
+4. Hook in first line
 5. ONE clear CTA only
 6. Sign off with sender name
 7. No "I hope this finds you well"
 8. No [brackets] — write complete ready-to-send email
 
-Output only the email, nothing else.`;
+Output only the email.`;
 
-    try {
-      // Calls our secure backend — API key is hidden on the server
-      const res = await fetch('/api/generate', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({prompt})
-      });
-      const data = await res.json();
-      if(data.error) throw new Error(data.error);
-      const emailText = data.email;
-      currentEmail=emailText;
-
-      used++;total++;
-      localStorage.setItem('cc_used',used);
-      localStorage.setItem('cc_total',total);
-      document.getElementById('stat-gen').textContent=total;
-
-      const now=new Date();
-      const timeStr=now.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-      emailHistory.push({email:emailText,niche,prospect,time:timeStr});
-      if(emailHistory.length>30)emailHistory=emailHistory.slice(-30);
-      localStorage.setItem('cc_history',JSON.stringify(emailHistory));
-
-      revealOutput(emailText,true);
-      refreshBanner();
-    } catch(e) {
-      document.getElementById('output-placeholder').innerHTML='<div style="color:var(--red);font-size:14px;padding:8px">'+( e.message||'Something went wrong. Please try again.')+'</div>';
-      document.getElementById('output-placeholder').style.display='flex';
-    }
-    btn.disabled=false;
-    btnTxt.innerHTML='⚡ Generate Cold Email';
+  try{
+    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const data=await res.json();
+    if(data.error)throw new Error(data.error);
+    curEmail=data.email;
+    used++;total++;
+    localStorage.setItem('cc_used',used);localStorage.setItem('cc_total',total);
+    const now=new Date();
+    const ts=now.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    hist.push({email:data.email,niche,prospect,time:ts});
+    if(hist.length>30)hist=hist.slice(-30);
+    localStorage.setItem('cc_history',JSON.stringify(hist));
+    revealOut(data.email,true);refreshBanner();
+  }catch(e){
+    document.getElementById('out-ph').innerHTML=`<div style="color:var(--red);font-size:13px;padding:8px">${e.message||'Something went wrong. Please try again.'}</div>`;
+    document.getElementById('out-ph').style.display='flex';
   }
+  btn.disabled=false;btnTxt.innerHTML='Generate Emails ✨';
+}
 
-  function revealOutput(text,animate) {
-    document.getElementById('output-placeholder').style.display='none';
-    const el=document.getElementById('output-text');
-    el.style.display='block';el.textContent='';
-    if(!animate){el.textContent=text;showScore(text);return;}
-    const cursor=document.createElement('span');cursor.className='cursor';el.appendChild(cursor);
-    const chars=text.split(''),speed=Math.max(8,Math.min(22,3000/chars.length));
-    let i=0;
-    const type=()=>{if(i<chars.length){el.insertBefore(document.createTextNode(chars[i]),cursor);i++;setTimeout(type,speed);}else{cursor.remove();showScore(text);}};
-    type();
-    document.getElementById('word-count').textContent=text.split(/\s+/).filter(Boolean).length+' words';
-  }
+function revealOut(text,animate){
+  document.getElementById('out-ph').style.display='none';
+  const el=document.getElementById('out-txt');
+  el.style.display='block';el.textContent='';
+  if(!animate){el.textContent=text;showScore(text);return;}
+  const cursor=document.createElement('span');cursor.className='cur';el.appendChild(cursor);
+  const chars=text.split(''),speed=Math.max(8,Math.min(22,3000/chars.length));
+  let i=0;
+  const type=()=>{if(i<chars.length){el.insertBefore(document.createTextNode(chars[i]),cursor);i++;setTimeout(type,speed);}else{cursor.remove();showScore(text);}};
+  type();
+  document.getElementById('wc').textContent=text.split(/\s+/).filter(Boolean).length+' words';
+}
 
-  function showScore(text) {
-    document.getElementById('score-bar').style.display='flex';
-    let s=60;
-    if(text.includes('Subject:'))s+=10;
-    if(text.length>200)s+=5;if(text.length<800)s+=5;
-    if(!/\[.*?\]/.test(text))s+=10;if(/\?/.test(text))s+=5;if(/\d/.test(text))s+=5;
-    s=Math.min(s,98);
-    setTimeout(()=>{document.getElementById('score-fill').style.width=s+'%';document.getElementById('score-num').textContent=s+'%';},300);
-  }
+function showScore(text){
+  document.getElementById('sc-bar').style.display='flex';
+  let s=60;
+  if(text.includes('Subject:'))s+=10;
+  if(text.length>200)s+=5;if(text.length<800)s+=5;
+  if(!/\[.*?\]/.test(text))s+=10;if(/\?/.test(text))s+=5;if(/\d/.test(text))s+=5;
+  s=Math.min(s,98);
+  setTimeout(()=>{document.getElementById('sc-fill').style.width=s+'%';document.getElementById('sc-num').textContent=s+'%';},300);
+}
 
-  function copyEmail() {
-    if(!currentEmail)return;
-    navigator.clipboard.writeText(currentEmail).then(()=>{
-      const b=document.getElementById('copy-btn');
-      b.textContent='✓ Copied!';b.classList.add('copied');
-      setTimeout(()=>{b.textContent='Copy';b.classList.remove('copied');},2000);
-      toast('✓ Copied to clipboard!');
-    });
-  }
+function copyEmail(){
+  if(!curEmail)return;
+  navigator.clipboard.writeText(curEmail).then(()=>{
+    const b=document.getElementById('copy-btn');b.textContent='✓ Copied!';b.classList.add('done');
+    setTimeout(()=>{b.textContent='Copy';b.classList.remove('done');},2000);
+    showToast('✓ Copied to clipboard!');
+  });
+}
 
-  function startCheckout() {
-    window.location.href=STRIPE_PAYMENT_LINK;
-  }
+function startCheckout(){window.location.href=STRIPE_PAYMENT_LINK;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-  function toast(msg) {
-    const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
-    setTimeout(()=>t.classList.remove('show'),2800);
-  }
-
-  init();
+init();
 </script>
 </body>
 </html>
